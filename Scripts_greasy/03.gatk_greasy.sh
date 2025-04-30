@@ -56,6 +56,7 @@ gatk --java-options "-Xmx3g -Xms3g" VariantFiltration \
 	--filter-expression "QUAL < 1000.0"  \
 	--filter-name "QUAL1000"  
 
+#Filter by the ones that PASS the filter of QUAL > 1000 on DNA
 bcftools view -f PASS ${TMPDIR}/${sample}.${ploidy}_filtering_1.g.vcf.gz > ${TMPDIR}/${sample}.${ploidy}_filtering.g.vcf.gz
 
 

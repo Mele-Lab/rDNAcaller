@@ -53,7 +53,7 @@ for item in $(cat IDs.tab); do
 done
 sbatch --ntasks=160 --cpus-per-task=56 03.to_submit_gatk_greasy.sh
 
-#The code only outputs variant positions, if we want information on all positions:
+#If we want the vcf file to contain information on all positions and not only the variants
 rm 03.greasy_file_gatk.txt
 for item in $(cat IDs.tab); do
 	echo -e "Scripts_greasy/03.gatk_greasy.sh\t$item\t$input_folder\t$output_folder\t20\tBP_RESOLUTION" >> 03.greasy_file_gatk.txt
