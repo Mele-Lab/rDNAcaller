@@ -5,7 +5,7 @@
 #SBATCH --error=./out/greasy_gatk.%A.err
 #SBATCH --account=bsc83
 #SBATCH --qos=gp_bscls
-#SBATCH --time=08:00:00
+#SBATCH --time=12:00:00
 
 # load modules
 module load ucx greasy
