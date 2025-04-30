@@ -65,5 +65,3 @@ Step 4: merging the vcfs from the different samples into one:
 ```
 Rscript Scripts_greasy/04.merge_gVCF.R IDs.tab output/
 ```
-
-# Running the code for RNA:
