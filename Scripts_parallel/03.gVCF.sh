@@ -31,7 +31,7 @@ echo $genotypes
 
 if [[ $species == "mouse" ]]; then
 	reference=/gpfs/projects/bsc83/Data/assemblies/Mm39/Mouse_mm39-rDNA_genome_v1.0/mm39-rDNA_v1.0.fa
-	intervals=/gpfs/projects/bsc83/Projects/ribosomal_RNAs/Jose/11_Mice/data/pre-rRNA_47S.included_intervals.bed
+	intervals=/gpfs/projects/bsc83/Projects/ribosomal_RNAs/Jose/11_Mice/data/pre-rRNA_47S.regions.bed
 elif [[ $species == "human" ]]; then
 	reference=/gpfs/projects/bsc83/Data/assemblies/T2T_CHM13/chrR/Human_hs1-rDNA_genome_v1.0/hs1-rDNA_v1.0.fa
 	#The reference comes from this paper: https://www.jbc.org/article/S0021-9258(23)01794-5/fulltext 
@@ -45,7 +45,7 @@ bam=${input_folder}/${sample}.sorted.chrR.f2F2308q20.wo_XA.bam
 
 echo "$bam has started at $(date)"
 
-if [[ $type == "RNA" ]]; then
+if [[ $type == "BP_RESOLUTION" ]]; then
 	gatk --java-options "-Xmx115g -Xms100g" HaplotypeCaller \
 		-I ${bam} \
 		-R ${reference} \
@@ -58,6 +58,8 @@ if [[ $type == "RNA" ]]; then
 		--max-genotype-count ${genotypes} \
 		--min-base-quality-score 0 \
 		-ERC BP_RESOLUTION
+
+
 else #DNA
 #The differences are that in RNA we want to include -ERC BP_RESOLUTION to have information on all positions and not only variant positions. In this way, we can know if a DNA variant is not called in RNA because there are not enough reads or because it is not expressed
 	gatk --java-options "-Xmx115g -Xms100g" HaplotypeCaller \
@@ -82,23 +84,17 @@ gatk --java-options "-Xmx3g -Xms3g" VariantFiltration \
 	--filter-expression "QUAL < 1000.0"  \
 	--filter-name "QUAL1000"  
 
-#Filter by the ones that PASS the filter of QUAL > 1000 on DNA, but not in RNA
-if [[ $type == "RNA" ]]; then
-#If RNA we don't need the filter on quality because we will consider only the variants that were also found in DNA
-	bcftools view ${TMPDIR}/${sample}.${ploidy}_filtering_1.g.vcf.gz > ${TMPDIR}/${sample}.${ploidy}_filtering.g.vcf.gz
-else #DNA
-#If DNA we use a filter on quality.
-	bcftools view -f PASS ${TMPDIR}/${sample}.${ploidy}_filtering_1.g.vcf.gz > ${TMPDIR}/${sample}.${ploidy}_filtering.g.vcf.gz
-fi
+#Filter by the ones that PASS the filter of QUAL > 1000 on DNA
+bcftools view -f PASS ${TMPDIR}/${sample}.${ploidy}_filtering_1.g.vcf.gz > ${output_folder}/${sample}.${ploidy}_filtering.g.vcf.gz
 
 #Removing PL from the vcf, this is necessary for bcftools norm
 bcftools annotate \
     	-x ^INFO/DP,^FORMAT/GT,^FORMAT/AD,^FORMAT/DP,^FORMAT/GQ \
-    	${TMPDIR}/${sample}.${ploidy}_filtering.g.vcf.gz > ${TMPDIR}/${sample}.${ploidy}_filtering.g_wo_PL.vcf
+    	${output_folder}/${sample}.${ploidy}_filtering.g.vcf.gz > ${output_folder}/${sample}.${ploidy}_filtering.g_wo_PL.vcf
 
 #Remove alternative alleles that have not been called from g.vcf. Sometime GATK adds a variant in the ALT column when it has not been called
 #-O z is to get the output as .gz
-bcftools view --trim-alt-alleles ${TMPDIR}/${sample}.${ploidy}_filtering.g_wo_PL.vcf -O z -o ${TMPDIR}/${sample}.${ploidy}_trim.vcf.gz 
+bcftools view --trim-alt-alleles ${output_folder}/${sample}.${ploidy}_filtering.g_wo_PL.vcf -O z -o ${output_folder}/${sample}.${ploidy}_trim.vcf.gz 
 
 #Split multiallelic positions into different rows of "biallelic" positions. If we add the reference fasta, reference alleles are adjusted so all donors call them in the same way
 #-O z is to get the output as .gz.
@@ -106,7 +102,7 @@ bcftools norm \
         -m -any \
         --old-rec-tag INFO \
 	--fasta-ref $reference \
-        ${TMPDIR}/${sample}.${ploidy}_trim.vcf.gz -O z --threads ${threads} > ${output_folder}/${sample}.vcf.gz
+        ${output_folder}/${sample}.${ploidy}_trim.vcf.gz -O z --threads ${threads} > ${output_folder}/${sample}.vcf.gz
 
 bcftools index -t ${output_folder}/${sample}.vcf.gz #Creating index in .tbi format (-t), we will need index if we plan to use bcftools merge
         	

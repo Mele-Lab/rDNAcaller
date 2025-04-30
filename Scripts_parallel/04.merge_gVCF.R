@@ -6,37 +6,53 @@ setwd(system("pwd", intern = T)) #If in linux
 args = commandArgs(trailingOnly=TRUE)
 
 list <- args[1] #This is a .txt file with the name of all samples that we want to merge
-# list <- read.table("WGS_ids.tab")
-# list <- read.table("WGS_GTEx_ids.tab")
+# list <- "WGS_ids.tab"
 output <- args[2] #This is the output directory
-# output <- "calling_ploidy_20"
-# output <- "calling_GTEx"
+# output <- "Results_calling"
 list <- read.table(list)
-# list <- read.table("calling_ploidy_20/SRR1997411.20_filtering_norm_called.vcf.gz")
 
-#Initialize the final vcf with the information of the first sample
-first_sample <- list$V1[1]
-final_vcf <- read.table(paste0(output, "/", first_sample, ".vcf.gz"))[,c(1,2,4,5,10)]
-colnames(final_vcf) <- c("CHR", "POS", "REF", "ALT", first_sample)
-final_vcf[[paste0(first_sample, ".GT")]] <- sapply(final_vcf[,5], function(entry) strsplit(entry, ":")[[1]][1])
-final_vcf[[paste0(first_sample, ".AD")]] <- sapply(final_vcf[,5], function(entry) strsplit(entry, ":")[[1]][2])
-final_vcf <- final_vcf[,-5]
 
-#Iterate over the last samples to add their info into the final vcf
-for(sample in list$V1[-1]){
-  print(paste0("Adding sample", grep(sample, list$V1)))
-  vcf <-  read.table(paste0(output, "/", sample, ".vcf.gz"))[,c(1,2,4,5,10)]
-  colnames(vcf) <- c("CHR", "POS", "REF", "ALT", sample)
-  vcf[[paste0(sample, ".GT")]] <- sapply(vcf[,5], function(entry) strsplit(entry, ":")[[1]][1])
-  vcf[[paste0(sample, ".AD")]] <- sapply(vcf[,5], function(entry) strsplit(entry, ":")[[1]][2])
-  vcf <- vcf[,-5]
-  
-  #Merge the two vcf files
-  final_vcf <- merge(final_vcf, vcf, by=c("CHR", "POS", "REF", "ALT"), all = T) 
-  #The parameter all=T is for adding variants that might not be in all samples. At the end, we will add 0s for the rest of the samples
+suppressWarnings(library(data.table))     # For efficient data handling
+suppressPackageStartupMessages(library(dplyr)) #To split columns
+suppressWarnings(library(tidyr)) #to split columns
+suppressWarnings(library(parallel)) #To run in parallel
+
+process_sample <- function(sample){
+  tryCatch({ #I am running this to notify if some sample failed but still generating the output for the rest
+    #Reading vcf file
+    path <- paste0(output, "/", sample, ".vcf.gz")
+    if(file.size(path)==0){ #If the size file is 0, we return NULL
+      return(NULL)
+    }
+    # vcf <- fread(path,select = c(1, 2, 4, 5, 10))
+    vcf <- read.table(path)[,c(1,2,4,5,10)]
+    #Procesing vcf file
+    colnames(vcf) <- c("CHR", "POS", "REF", "ALT", sample)
+    suppressWarnings(vcf <- vcf %>% #The warnings here refer to ././././, which DE is set as NA, this is what we want, so no problem. This happens very rarely
+                       separate(sample, into=c("GT", "AD", "DP", "GQ"), sep=":"))
+    suppressWarnings(vcf <- vcf %>% #The warnings are expected (and normal), it means that there are no reads for ALT_D, so we put the NA
+                       separate(AD, into=c("REF_D", "ALT_D"), sep=","))
+    
+    vcf <- vcf[,c(2:8)]
+    colnames(vcf)[4:7] <- paste0(sample, ".", colnames(vcf)[4:7])
+    return(vcf)
+  }, error = function(e) {
+    # If an error occurs, print the sample ID that failed
+    cat("Failed to read data for", grep(sample, list$V1), "\n")
+  })
+
 }
-
+samples <- list$V1
+print("about to start")
+# result_list <- lapply(samples, process_sample)
+result_list <- mclapply(samples, process_sample, mc.cores = 112)
+# Remove NULLs in case any files didn't exist
+print("over here")
+result_list <- result_list[!sapply(result_list, is.null)]
+print("about to reduce")
+# Combine all data frames, including the first sample
+final_vcf <- Reduce(function(x, y) merge(x, y, by = c("POS", "REF", "ALT"), all = TRUE), result_list)
 
 #Save final vcf (even though it is no longer a vcf format, so I will save it as txt)
-
-write.table(final_vcf, paste0(output, "/merged.txt"), row.names = F, quote = F, sep="\t")
+print(paste0(output, "/merged_with_DP.txt"))
+write.table(final_vcf, paste0(output, "/merged_with_DP.txt"), row.names = F, quote = F, sep="\t")

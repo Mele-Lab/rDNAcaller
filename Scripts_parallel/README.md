@@ -37,15 +37,12 @@ sbatch -a 1-10 --time=00:30:00 Scripts_parallel/02.mapping.sh IDs.tab input/ out
 Step 3: Variant calling
 ```
 sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human
-#DNA is the default, if using RNA:
-sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human RNA
+#If we want to output information on all positions and not only the variants
+sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human BP_RESOLUTION
 
 ```
 
 Step 4: merging the vcfs from the different samples into one:
 ```
-#Original version
 Rscript Scripts_parallel/04.merge_gVCF.R IDs.tab output/
-#New version that outputs read depth (DP) and is more efficient
-Rscript Scripts_parallel/04.merge_gVCF_RNA.R IDs.tab output/
 ```

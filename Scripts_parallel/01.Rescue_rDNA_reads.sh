@@ -50,7 +50,7 @@ echo ""
 # Step 2
 if [[ $species == "mouse" ]]; then
 	echo "Running nucmer to keep candidate rDNA reads"
-	rDNA_reference=data/chrR.fa
+	rDNA_reference=/gpfs/projects/bsc83/Projects/ribosomal_RNAs/Jose/11_Mice/data/chrR.fa
 elif [[ $species == "human" ]]; then
 	rDNA_reference=/gpfs/projects/bsc83/Data/assemblies/T2T_CHM13/chrR/Human_hs1-rDNA_genome_v1.0/chroms/hs1-rDNA_v1.0.chrR.47S_pre-rRNA.500padded.fa
 	#The reference is adapted from this paper: https://www.jbc.org/article/S0021-9258(23)01794-5/fulltext
