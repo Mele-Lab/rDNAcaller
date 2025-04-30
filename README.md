@@ -1,5 +1,5 @@
 # rDNAcaller
-Repository to call rDNA variants from short read sequencing
+Repository to call rDNA variants from short read WGS
 
 # Software dependencies
 
@@ -63,6 +63,11 @@ singularity exec rdna_variant_caller_latest.sif ./Pipeline.sh -t DNA -n SRR14773
 To run a parallel version of the code using SLURM, check inside Scripts_parallel/ or using greasy, Scripts_greasy/
 
 Other code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/
+
+Code to run the simulator from "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available here: https://github.com/Rbbt-Workflows/SyntheticRDNA and the singularity image here:
+```
+singularity pull --arch amd64 library://jmiguelramirez/jmiguelramirez/simulator:latest
+```
 
 
 
