@@ -23,3 +23,8 @@ Script to compute nucleotide diversity score:
 ```
 Rscript NucleotideDiversity.R
 ```
+
+Script to compute intragenomic frequencies from the rDNAcaller output and add the region and the expansion segments where the variants belong, plus all different coordinate systems:
+```
+Rscript Creating_supplementary_table_from_rDNAcaller_output.R
+```
