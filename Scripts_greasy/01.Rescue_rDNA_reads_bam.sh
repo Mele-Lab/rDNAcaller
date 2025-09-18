@@ -45,7 +45,7 @@ else
 fi
 
 
-samtools view -@ 60 -h -T ${reference} -L ${bed_file} ${cram_file} | samtools fastq -@ 60 -N --reference ${reference} -1 ${output_folder}/${file}.rDNA-like.R1.fastq.gz -2 ${output_folder}/${file}.rDNA-like.R2.fastq.gz 
+samtools view -@ 60 -h -T ${reference} -L ${bed_file} ${cram_file} | samtools fastq -@ 60 -N --reference ${reference} -1 ${TMPDIR}/${file}.rDNA-like.R1.fastq.gz -2 ${TMPDIR}/${file}.rDNA-like.R2.fastq.gz 
 
 echo "fastq of rDNA_like regions created ${date}"
 
@@ -53,8 +53,8 @@ echo "fastq of rDNA_like regions created ${date}"
 
 #Convert fastq to fasta
 echo "start: converting fastq to fasta - $(date)"
-seqkit sort ${output_folder}/${file}.rDNA-like.R1.fastq.gz | gzip > ${TMPDIR}/${file}.R1.sorted.fastq.gz
-seqkit sort ${output_folder}/${file}.rDNA-like.R2.fastq.gz | gzip > ${TMPDIR}/${file}.R2.sorted.fastq.gz
+seqkit sort ${TMPDIR}/${file}.rDNA-like.R1.fastq.gz | gzip > ${TMPDIR}/${file}.R1.sorted.fastq.gz
+seqkit sort ${TMPDIR}/${file}.rDNA-like.R2.fastq.gz | gzip > ${TMPDIR}/${file}.R2.sorted.fastq.gz
 
 seqkit fq2fa ${TMPDIR}/${file}.R1.sorted.fastq.gz -j 16 > ${TMPDIR}/${file}_1.fasta
 seqkit fq2fa ${TMPDIR}/${file}.R2.sorted.fastq.gz -j 16 > ${TMPDIR}/${file}_2.fasta

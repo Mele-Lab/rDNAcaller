@@ -30,7 +30,7 @@ sbatch -a 1-10 Scripts_parallel/01.Rescue_rDNA_reads_bam.sh IDs.tab input/ outpu
 Step 2: Mapping candidate rDNA reads to our custom reference (it has a bwa index):
 ```
 sbatch -a 1-10 --time=00:30:00 Scripts_parallel/02.mapping.sh IDs.tab input/ output/ human
-#DNA is the default, if using RNA:
+#DNA is the default, if using the option "RNA", there is not need to run MUMmer:
 sbatch -a 1-10 --time=00:30:00 Scripts_parallel/02.mapping.sh IDs.tab input/ output/ human RNA
 ```
 
@@ -39,7 +39,8 @@ Step 3: Variant calling
 sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human
 #If we want to output information on all positions and not only the variants
 sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human BP_RESOLUTION
-
+#If we only want to call known variants from a vcf, where the vcf id the second column of IDs.tab
+sbatch -a 1-10 Scripts_parallel/03.gVCF_vcf.sh IDs.tab input/ output/ human
 ```
 
 Step 4: merging the vcfs from the different samples into one:

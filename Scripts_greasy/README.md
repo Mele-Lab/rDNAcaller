@@ -61,6 +61,15 @@ done
 sbatch --ntasks=160 --cpus-per-task=56 03.to_submit_gatk_greasy.sh
 ```
 
+Step 3B: Variant calling using a vcf with known variants as input:
+```
+rm 03.greasy_file_gatk_vcf.txt
+for item in $(cat IDs.tab); do
+	echo -e "Scripts_greasy/03.gatk_greasy_vcf.sh\t$item\t$input_folder\t$output_folder\t20\t$vcf" >> 03.greasy_file_gatk_vcf.txt
+done
+sbatch --ntasks=160 --cpus-per-task=56 03.to_submit_gatk_greasy_vcf.sh
+```
+
 Step 4: merging the vcfs from the different samples into one:
 ```
 Rscript Scripts_greasy/04.merge_gVCF.R IDs.tab output/
