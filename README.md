@@ -1,6 +1,11 @@
 # rDNAcaller
 Repository to call rDNA variants from short read WGS
 
+
+[![DOI](https://zenodo.org/badge/849333415.svg)](https://doi.org/10.5281/zenodo.17179667)
+
+
+
 # Software dependencies
 
 | Package | Version | 
