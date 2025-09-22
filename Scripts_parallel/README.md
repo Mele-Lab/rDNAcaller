@@ -17,30 +17,32 @@ Repository to call rDNA variants from short read sequencing in parallel
 
 # Running the code:
 
-To run the code in parallel using SLURM arrays, we just need a .txt file with all the sample IDs (file names): IDs.tab. If a sample is called SRA123.cram, the ID should be SRA123. All .out and .err files will be stored in a folder named out/ in the source file location
+To run the code in parallel using SLURM arrays, we just need a txt file with all the sample IDs (file names): IDs.tab. If a sample is called SRA123.cram, the ID should be SRA123. All .out and .err files will be stored in a folder named out/ in the source file location
+
+We included a subset of reads from two samples from the CHM13 cell line in Data/ together with the expected vcf after running rDNAcaller
 
 Step 1A: Retrieving candidate rDNA reads from fastq files. If the input is RNA, we can skip this script that calls MUMmer. Available for human and mouse
 ```
-sbatch -a 1-10 Scripts_parallel/01.Rescue_rDNA_reads.sh IDs.tab input/ output/ human
+sbatch -a 1-2 --time=00:30:00 Scripts_parallel/01.Rescue_rDNA_reads.sh Data/IDs.tab Data/ output/ human
 ```
 Step 1B: Retrieving candidate rDNA reads from cram/bam files. If the input is RNA, we can skip this script that calls MUMmer:
 ```
-sbatch -a 1-10 Scripts_parallel/01.Rescue_rDNA_reads_bam.sh IDs.tab input/ output/ human
+sbatch -a 1-2 Scripts_parallel/01.Rescue_rDNA_reads_bam.sh Data/IDs.tab Data/ output/ human
 ```
 Step 2: Mapping candidate rDNA reads to our custom reference (it has a bwa index):
 ```
-sbatch -a 1-10 --time=00:30:00 Scripts_parallel/02.mapping.sh IDs.tab input/ output/ human
+sbatch -a 1-2 --time=00:30:00 Scripts_parallel/02.mapping.sh Data/IDs.tab output/ output/ human
 #DNA is the default, if using the option "RNA", there is not need to run MUMmer:
-sbatch -a 1-10 --time=00:30:00 Scripts_parallel/02.mapping.sh IDs.tab input/ output/ human RNA
+sbatch -a 1-2 --time=00:30:00 Scripts_parallel/02.mapping.sh IDs.tab Data/ output/ human RNA
 ```
 
 Step 3: Variant calling
 ```
-sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human
+sbatch -a 1-2 Scripts_parallel/03.gVCF.sh Data/IDs.tab output/ output/ human
 #If we want to output information on all positions and not only the variants
-sbatch -a 1-10 Scripts_parallel/03.gVCF.sh IDs.tab input/ output/ human BP_RESOLUTION
+sbatch -a 1-2 Scripts_parallel/03.gVCF.sh Data/IDs.tab input/ output/ human BP_RESOLUTION
 #If we only want to call known variants from a vcf, where the vcf id the second column of IDs.tab
-sbatch -a 1-10 Scripts_parallel/03.gVCF_vcf.sh IDs.tab input/ output/ human
+sbatch -a 1-2 Scripts_parallel/03.gVCF_vcf.sh Data/IDs.tab input/ output/ human
 ```
 
 Step 4: merging the vcfs from the different samples into one:

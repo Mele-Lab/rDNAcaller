@@ -43,24 +43,24 @@ This code runs a variant caller for rDNA reads
 Syntax: Pipeline.sh [-h|-t|-n|-f|-i|-o]
 parameters:
 h     Print the help message.
-t     Type of input data: Either DNA or RNA.
+t     Type of analysis: Either WGS to call all variants or vcf to call a subset of known variants.
 n     Basename of the input data: (e.g., for a bam file named sample.bam: -n sample, for fastqs named sample_1.fastq.gz and sample_2.fasq.gz: -n sample. This means that paired fastqs should end by _1.fastq.gz and _2.fastq.gz)
 f     Type of input data format: Either bam (for bam/cram/sam) or fastq.
 i     Input folder.
 o     Output folder.
 ```
 
-Example using a small fraction of reads from a sample in the publicly available dataset: Randolph et al. Science 2021
+Example using a small fraction of reads from a CHM13 sample, for which input fastq files and expected output vcf are in Data/
 ```
-./Pipeline.sh -t DNA -n SRR14773542 -f fastq -i Data/ -o Results/
+./Pipeline.sh -t WGS -n SRR14773542 -f fastq -i Data/ -o Results/
 ```
 
 If using the singularity image:
 ```
-singularity exec rdna_variant_caller_latest.sif ./Pipeline.sh -t DNA -n SRR14773542 -f fastq -i Data/ -o Results/
+singularity exec rdna_variant_caller_latest.sif ./Pipeline.sh -t WGS -n SRR14773542 -f fastq -i Data/ -o Results/
 ```
 
-To run a parallel version of the code using SLURM, check inside Scripts_parallel/ or using greasy, Scripts_greasy/
+To run a parallel version of the code using SLURM, check inside Scripts_parallel or using greasy, Scripts_greasy/
 
 Other code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/
 

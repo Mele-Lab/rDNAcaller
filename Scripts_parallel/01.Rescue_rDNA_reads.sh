@@ -8,6 +8,10 @@
 #SBATCH --account=bsc83
 #SBATCH --time=02:30:00
 
+
+#Notes:
+#Edit --account to your own SLURM parameter
+
 #INPUT : fastq
 #Step 1   (using seqkit)        : Convert fastq file to fasta (nucmer takes fasta as input) 
 #Step 2   (using nucmer)        : Extract candidate rDNA reads (reads with a 30nt exact match with a provided reference sequence)
