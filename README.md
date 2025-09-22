@@ -52,7 +52,7 @@ o     Output folder.
 
 Example using a small fraction of reads from a CHM13 sample, for which input fastq files and expected output vcf are in Data/
 ```
-./Pipeline.sh -t WGS -n SRR14773542 -f fastq -i Data/ -o Results/
+./Pipeline.sh -t WGS -n SRR3189741 -f fastq -i Data/ -o Results/
 ```
 
 If using the singularity image:
@@ -62,7 +62,9 @@ singularity exec rdna_variant_caller_latest.sif ./Pipeline.sh -t WGS -n SRR14773
 
 To run a parallel version of the code using SLURM, check inside Scripts_parallel or using greasy, Scripts_greasy/
 
-Other code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/
+# Running complementary code
+
+Other code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/ such as the code to compute mean nucleotide diversity score
 
 Code to run the simulator from "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available here: https://github.com/Rbbt-Workflows/SyntheticRDNA and the singularity image here:
 ```
