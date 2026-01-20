@@ -69,7 +69,7 @@ To run a parallel version of the code using SLURM, check inside Scripts_parallel
 
 # Running complementary code
 
-To see details on the metholody used, please check the paper: [rDNAcaller: a fast and robust workflow to call ribosomal DNA variants]([https://link-url-here.org](https://academic.oup.com/nargab/article/7/4/lqaf190/8383903)). The code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/ such as the code to compute mean nucleotide diversity score. The code to run the simulator is available here: https://github.com/Rbbt-Workflows/SyntheticRDNA and the singularity image here:
+To see details on the metholody used, please check the paper: [rDNAcaller: a fast and robust workflow to call ribosomal DNA variants]([https://link-url-here.org](https://academic.oup.com/nargab/article/7/4/lqaf190/8383903). The code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/ such as the code to compute mean nucleotide diversity score. The code to run the simulator is available here: https://github.com/Rbbt-Workflows/SyntheticRDNA and the singularity image here:
 ```
 singularity pull --arch amd64 library://jmiguelramirez/jmiguelramirez/simulator:latest
 ```
