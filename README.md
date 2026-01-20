@@ -40,7 +40,7 @@ gatk-launch CreateSequenceDictionary -R Reference/Human_hs1-rDNA_genome_v1.0/hs1
 bwa index -p Reference/new_index Reference/Human_hs1-rDNA_genome_v1.0/hs1-rDNA_v1.0.fa
 ```
 
-To run the code sequentially
+We recommend running the code optimised for parallel execution (see below or inside the folder Scripts_parallel/), but to run the code sequentially:
 ```
 ./Pipeline.sh -h
 This code runs a variant caller for rDNA reads
@@ -69,9 +69,7 @@ To run a parallel version of the code using SLURM, check inside Scripts_parallel
 
 # Running complementary code
 
-Other code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/ such as the code to compute mean nucleotide diversity score
-
-Code to run the simulator from "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available here: https://github.com/Rbbt-Workflows/SyntheticRDNA and the singularity image here:
+To see details on the metholody used, please check the paper: [rDNAcaller: a fast and robust workflow to call ribosomal DNA variants]([https://link-url-here.org](https://academic.oup.com/nargab/article/7/4/lqaf190/8383903)). The code used to complement the manuscript: "rDNAcaller: a fast and robust workflow to call ribosomal DNA variants" is available inside Downstream_analysis/ such as the code to compute mean nucleotide diversity score. The code to run the simulator is available here: https://github.com/Rbbt-Workflows/SyntheticRDNA and the singularity image here:
 ```
 singularity pull --arch amd64 library://jmiguelramirez/jmiguelramirez/simulator:latest
 ```
