@@ -2,8 +2,8 @@ bootstrap: docker
 from: ubuntu:20.04
 
 %labels
-	Author Jose Miguel Ramirez
 	Version v1.0
+	Author Jose Miguel Ramirez
 
 %help
     This Singularity image contains all dependencies for the pipeline.
@@ -11,7 +11,8 @@ from: ubuntu:20.04
 
 
 %environment
-    export PATH=/opt/conda/bin:/opt/tools:$PATH
+    export PATH=/opt/conda/bin:/opt/gatk:/opt/tools:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 
 
@@ -54,6 +55,8 @@ from: ubuntu:20.04
         make \
         zlib1g-dev \
         libncurses5-dev \
+        libncursesw6 \
+        libtinfo6 \
         libbz2-dev \
         liblzma-dev \
         libcurl4-openssl-dev \
@@ -62,6 +65,7 @@ from: ubuntu:20.04
         build-essential \
         openjdk-17-jdk \
         git
+    
 
     # Install Miniconda and configure tools
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3.sh
@@ -99,5 +103,7 @@ from: ubuntu:20.04
 
     # Clean up
     /opt/conda/bin/conda clean -a -y
-    echo "export PATH=/opt/conda/bin:\$PATH" >> /etc/environment
-    echo "export PATH=/opt/conda/bin:\$PATH" >> ~/.bashrc
+    echo "export PATH=/opt/conda/bin:/opt/gatk:/opt/tools:\$PATH" >> /etc/environment
+    echo "export PATH=/opt/conda/bin:/opt/gatk:/opt/tools:\$PATH" >> ~/.bashrc
+    echo "export LD_LIBRARY_PATH=/usr/local/lib:\$LD_LIBRARY_PATH" >> /etc/environment
+    echo "export LD_LIBRARY_PATH=/usr/local/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
