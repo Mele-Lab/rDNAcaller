@@ -20,9 +20,10 @@ Repository to call rDNA variants from short read WGS
 | bcftools | 1.19 |
 | R | 4.3.2 |
 
-We created a singularity image with all necessary software
+We recommend installing the latest versions of these software dependencies. However, we have also created a Singularity image containing the exact versions used in our analyses.
 ```
-singularity pull library://jmiguelramirez/jmiguelramirez/rdna_variant_caller:latest
+apptainer build rDNAcaller.sif rDNAcaller.def #Using apptainer
+sudo singularity build rdna_variant_caller.sif rDNAcaller.def #Alternatively using singularity
 ```
 
 
@@ -40,7 +41,10 @@ gatk-launch CreateSequenceDictionary -R Reference/Human_hs1-rDNA_genome_v1.0/hs1
 bwa index -p Reference/new_index Reference/Human_hs1-rDNA_genome_v1.0/hs1-rDNA_v1.0.fa
 ```
 
-We recommend running the code optimised for parallel execution (see below or inside the folder Scripts_parallel/), but to run the code sequentially:
+We recommend using the version of the code optimised for parallel execution with SLURM (see Scripts_parallel/). Alternatively, for execution using GNU Greasy, see Scripts_greasy/.
+
+To run the code sequentially, use the following version:
+
 ```
 ./Pipeline.sh -h
 This code runs a variant caller for rDNA reads
@@ -62,10 +66,9 @@ Example using a small fraction of reads from a CHM13 sample, for which input fas
 
 If using the singularity image:
 ```
-singularity exec rdna_variant_caller_latest.sif ./Pipeline.sh -t WGS -n SRR14773542 -f fastq -i Data/ -o Results/
+apptainer exec rdna_variant_caller_latest.sif ./Pipeline.sh -t DNA -n SRR14773542 -f fastq -i Data/ -o Results/  #Using apptainer
+singularity exec rdna_variant_caller_latest.sif ./Pipeline.sh -t DNA -n SRR14773542 -f fastq -i Data/ -o Results/ #Alternatively using singularity
 ```
-
-To run a parallel version of the code using SLURM, check inside Scripts_parallel or using greasy, Scripts_greasy/
 
 # Running complementary code
 

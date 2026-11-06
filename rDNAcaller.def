@@ -1,0 +1,103 @@
+bootstrap: docker
+from: ubuntu:20.04
+
+%labels
+	Author Jose Miguel Ramirez
+	Version v1.0
+
+%help
+    This Singularity image contains all dependencies for the pipeline.
+
+
+
+%environment
+    export PATH=/opt/conda/bin:/opt/tools:$PATH
+
+
+
+%runscript
+    echo "This Singularity container includes MUMMER, ANACONDA, seqkit, Samtools, BWA, GATK, Java OpenJDK, BCFtools, and R."
+    exec "$@"
+
+
+
+%test
+    echo "Testing installed software..."
+    which mummer
+    which seqkit
+    samtools --version
+    bwa
+    gatk --version
+    java -version
+    bcftools --version
+    R --version
+
+
+%post
+    # Suppress interactive prompts for tzdata
+    export DEBIAN_FRONTEND=noninteractive
+    ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime
+    echo "Europe/London" > /etc/timezone
+    apt-get update && apt-get install -y --no-install-recommends \
+        tzdata
+
+    dpkg-reconfigure -f noninteractive tzdata
+
+    # Install essential dependencies
+    apt-get install -y --no-install-recommends \
+        wget \
+        curl \
+        tar \
+        unzip \
+        gcc \
+        g++ \
+        make \
+        zlib1g-dev \
+        libncurses5-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        build-essential \
+        openjdk-17-jdk \
+        git
+
+    # Install Miniconda and configure tools
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3.sh
+    bash Miniconda3.sh -b -p /opt/conda
+    rm Miniconda3.sh
+    export PATH="/opt/conda/bin:$PATH"
+    /opt/conda/bin/conda init
+    /opt/conda/bin/conda config --set always_yes yes --set changeps1 no
+
+    # Install required Conda packages
+    /opt/conda/bin/conda install -c bioconda -c conda-forge \
+        seqkit=2.8.0 \
+        samtools=1.19.2 \
+        bwa=0.7.17 \
+        bcftools=1.19 \
+        r-base=4.3.2
+
+    # Manual Installation of MUMMER from the local tarball
+    echo "Installing MUMMER from tarball..."
+    wget https://github.com/mummer4/mummer/releases/download/v4.0.0rc1/mummer-4.0.0rc1.tar.gz
+    tar -xvzf mummer-4.0.0rc1.tar.gz
+    cd mummer-4.0.0rc1
+    ./configure
+    make
+    make install
+    cd ..
+    rm -rf mummer-4.0.0rc1.tar.gz mummer-4.0.0rc1
+
+    # Manual Installation of GATK (4.5.0.0)
+    echo "Installing GATK 4.5.0.0..."
+    wget https://github.com/broadinstitute/gatk/releases/download/4.5.0.0/gatk-4.5.0.0.zip
+    unzip gatk-4.5.0.0.zip
+    mv gatk-4.5.0.0 /opt/gatk
+    rm gatk-4.5.0.0.zip
+
+    # Clean up
+    /opt/conda/bin/conda clean -a -y
+    echo "export PATH=/opt/conda/bin:\$PATH" >> /etc/environment
+    echo "export PATH=/opt/conda/bin:\$PATH" >> ~/.bashrc
